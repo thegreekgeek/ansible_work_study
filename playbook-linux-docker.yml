@@ -1,0 +1,118 @@
+---
+- hosts: "*"
+  become: yes
+  tasks:
+
+    - name: Update package cache
+      apt:
+        update_cache: yes
+      become: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+      become: yes
+
+    - name: Check if a reboot is required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+
+    - name: install some useful stuff
+      apt:
+        name:
+          - zsh
+          - git
+          - just
+          - plocate
+          - ca-certificates
+          - curl
+          - net-tools
+          - traceroute
+        state: present            
+
+    - name: Set user shell to zsh
+      ansible.builtin.user:
+        name: "{{ user }}"
+        shell: /bin/zsh
+      become: true
+
+    - name: Download ohmyzsh
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+        dest: "/home/{{ user }}/install.sh"
+        mode: '0755'
+
+    - name: Install ohmyzsh
+      ansible.builtin.script:
+        cmd: "/home/{{ user }}/install.sh"
+
+    - name: Clone zsh-autocomplete plugin to oh-my-zsh plugin folder
+      git:
+        repo: 'https://github.com/marlonrichert/zsh-autocomplete.git'
+        depth: 1
+        dest: "{{ lookup('env', 'ZSH_CUSTOM') }}/plugins/zsh-autocomplete"
+
+    - name: Clone zsh-autocomplete plugin to oh-my-zsh plugin folder
+      git:
+        repo: 'https://github.com/zsh-users/zsh-syntax-highlighting.git'
+        depth: 1
+        dest: "{{ lookup('env', 'ZSH_CUSTOM') }}/plugins/zsh-syntax-highlighting"
+
+    - name: Clone zsh-autocomplete plugin to oh-my-zsh plugin folder
+      git:
+        repo: 'https://github.com/zsh-users/zsh-autosuggestions.git'
+        depth: 1
+        dest: "{{ lookup('env', 'ZSH_CUSTOM') }}/plugins/zsh-autosuggestions"
+
+    - name: Upload SSH key
+      copy:
+        src: ../keys/rob
+        dest: ~rob/.ssh/id_ed25519
+        owner: rob
+        group: newuser
+        mode: 0600
+
+    - name: Remove non-official packages
+      apt:
+        name: 
+          - docker.io
+          - docker-doc
+          - docker-compose
+          - docker-compose-v2
+          - podman-docker
+          - containerd
+          - runc
+        state: absent
+
+    - name: Create directory for apt keyrings
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker repository to apt sources
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+
+    - name: Update apt cache again
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: let's docker the docks
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli 
+          - containerd.io 
+          - docker-buildx-plugin 
+          - docker-compose-plugin
+        state: present  

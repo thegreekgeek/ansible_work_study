@@ -1,0 +1,14 @@
+dev_docker:
+  hosts:
+    docker_dev_01:
+      ansible_host: 172.17.34.177
+    docker_dev_02:
+      ansible_host: 172.17.34.127
+    docker_dev_03:
+      ansible_host: 172.17.34.184
+    docker_dev_04:
+      ansible_host: dev-docker-04
+    docker_dev_05:
+      ansible_host: dev-docker-05
+    docker_dev_06:
+      ansible_host: dev-docker-06

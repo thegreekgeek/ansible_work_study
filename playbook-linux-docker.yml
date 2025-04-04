@@ -33,19 +33,19 @@
 
     - name: Set user shell to zsh
       ansible.builtin.user:
-        name: "{{ user }}"
+        name: "rob"
         shell: /bin/zsh
       become: true
 
     - name: Download ohmyzsh
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-        dest: "/home/{{ user }}/install.sh"
+        dest: "/home/rob/install.sh"
         mode: '0755'
 
     - name: Install ohmyzsh
-      ansible.builtin.script:
-        cmd: "/home/{{ user }}/install.sh"
+      ansible.builtin.shell:
+        cmd: cat /home/rob/install.sh | sh -s -- -y
 
     - name: Clone zsh-autocomplete plugin to oh-my-zsh plugin folder
       git:

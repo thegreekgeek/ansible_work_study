@@ -16,7 +16,7 @@ dev_docker_new:
       ansible_host: dev-docker-06
 manager:
   hosts:
-    dev_docker_06:
+    dev_docker_04:
 worker:
   hosts:
     dev_docker_05:

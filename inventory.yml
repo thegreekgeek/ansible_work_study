@@ -1,4 +1,4 @@
-dev_docker:
+dev_docker_old:
   hosts:
     docker_dev_01:
       ansible_host: 172.17.34.177
@@ -6,9 +6,21 @@ dev_docker:
       ansible_host: 172.17.34.127
     docker_dev_03:
       ansible_host: 172.17.34.184
+dev_docker_new:
+  hosts:
     docker_dev_04:
       ansible_host: dev-docker-04
     docker_dev_05:
       ansible_host: dev-docker-05
     docker_dev_06:
       ansible_host: dev-docker-06
+manager:
+  hosts:
+    dev_docker_06:
+worker:
+  hosts:
+    dev_docker_05:
+    dev_docker_04:
+cluster:
+  children:
+    dev_docker_new:

@@ -1,4 +1,5 @@
 - hosts: cluster
+  become: yes
   tasks:
     - name: add default route so ansible_default_ipv4 is defined
       shell: >
@@ -7,8 +8,9 @@
       ignore_errors: True
 
     - name: determine swarm status
+      become: yes
       shell: >
-        docker info --format \{\{.Swarm.LocalNodeState\}\}
+        sudo docker info --format \{\{.Swarm.LocalNodeState\}\}
       register: swarm_status
 
     - name: Print the swarm status
@@ -44,6 +46,7 @@
 - hosts: swarm_inactive[0]
   tasks:
     - name: initialize swarm cluster
+      become: yes
       shell: >
         docker swarm init --advertise-addr={{ ansible_default_ipv4.address }}:2377
       when: "'swarm_active' not in groups"
@@ -63,6 +66,7 @@
     iface: "{{ ansible_default_ipv4['interface'] }}"
   tasks:
     - name: retrieve swarm manager token
+      become: yes
       shell: docker swarm join-token -q manager
       register: swarm_manager_token
     - name: populate list of manager ips
@@ -78,6 +82,7 @@
     token: "{{ hostvars[groups['swarm_active'][0]]['swarm_manager_token']['stdout'] }}"
   tasks:
     - name: join inactive nodes as manager to cluster
+      become: yes
       shell: >
         docker swarm join --advertise-addr={{ ansible_default_ipv4.address }}:2377
         --token={{ token }}
@@ -87,6 +92,7 @@
 - hosts: swarm_active[0]
   tasks:
     - name: Show nodes in the cluster
+      become: yes
       shell: docker node ls
       register: cluster_nodes
     - debug:

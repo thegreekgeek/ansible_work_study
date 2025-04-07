@@ -1,0 +1,16 @@
+- name: Start service with healthcheck
+  community.docker.docker_swarm_service:
+    name: serVis
+    image: dockersamples/visualizer:latest
+    mounts:
+      - source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        type: bind
+    # healthcheck:
+    #   # Check if nginx server is healthy by curl'ing the server.
+    #   # If this fails or timeouts, the healthcheck fails.
+    #   test: ["CMD", "curl", "--fail", "http://serVis.host.com"]
+    #   interval: 1m30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
